@@ -19,13 +19,12 @@ public class CamServer implements Runnable {
 
     private ServerSocket serverSocket;
     private CamRegister camRegister;
-    private int port;
+    private int port = 1099;
 
     @Override
     public void run() {
 
         try {
-            normalizePort();
             camRegister = new CamRegister();
             serverSocket = new ServerSocket(port);
 
@@ -44,15 +43,6 @@ public class CamServer implements Runnable {
 
     public void stopServer() throws IOException {
         serverSocket.close();
-    }
-
-    private void normalizePort() {
-
-        String portEnv = System.getenv("PORT");
-
-        portEnv = portEnv == null || portEnv.isEmpty() ? "3000" : portEnv;
-
-        port = Integer.valueOf(portEnv);
     }
 
 }
