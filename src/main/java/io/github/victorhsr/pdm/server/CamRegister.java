@@ -22,6 +22,12 @@ public class CamRegister {
 
     private static final CopyOnWriteArrayList<Cam> CAM_CLIENTS = new CopyOnWriteArrayList<>();
 
+    /**
+     * Find a previously registered Cam from its camCode
+     *
+     * @param camCode The camCode of the Cam
+     * @return The Cam that you are looking for
+     */
     public static Cam findRegisteredCam(String camCode) {
 
         List<Cam> collect = CAM_CLIENTS.stream().filter(camClient -> camClient.getCamCode().equals(camCode)).collect(Collectors.toList());
@@ -29,6 +35,12 @@ public class CamRegister {
         return collect.isEmpty() ? null : collect.get(0);
     }
 
+    /**
+     * Generates a camCode and create a Cam and then, store it in memory
+     *
+     * @param camSocket The socket that requested a connection to the server
+     * @throws IOException
+     */
     public static void addCamClient(Socket camSocket) throws IOException {
 
         String camCode = generateCamCode();
@@ -45,6 +57,11 @@ public class CamRegister {
         new ConnectionHandler(camClient).start();
     }
 
+    /**
+     * Remove a Cam from the memory
+     *
+     * @param camClient
+     */
     public static void removeCamClient(Cam camClient) {
 
         try {
@@ -60,11 +77,23 @@ public class CamRegister {
         CAM_CLIENTS.remove(camClient);
     }
 
+    /**
+     * Verify if the camCode is already registered in memory
+     *
+     * @param camCode The camCode that will be verified
+     * @return
+     */
     private static boolean existsCamcode(String camCode) {
 
         return CAM_CLIENTS.stream().anyMatch(camClient -> camClient.getCamCode().equals(camCode));
     }
 
+    /**
+     * Generate a randomized camCode following the pattern 'CAM @@@@@@-##', were
+     * '@' represents [A-Z] and '#' represents [0-9]
+     *
+     * @return The generated camCode
+     */
     private static String generateCamCode() {
 
         String camCode;
@@ -88,6 +117,13 @@ public class CamRegister {
         return camCode;
     }
 
+    /**
+     * Get specific digit of an integer number
+     *
+     * @param number The number that will be analyzed
+     * @param position The position of the number that will be returned
+     * @return
+     */
     private static int getSpecificDigit(int number, int position) {
 
         return (int) ((number / Math.pow(10, position - 1)) % 10);

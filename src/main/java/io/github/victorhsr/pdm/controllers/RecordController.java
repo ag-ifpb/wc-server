@@ -81,7 +81,7 @@ public class RecordController extends HttpServlet {
             output.close();
 
         } catch (Exception ex) {
-            System.out.println(ex.getMessage());
+            ex.printStackTrace();
         }
 
     }

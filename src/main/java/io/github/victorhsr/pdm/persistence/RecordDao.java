@@ -14,7 +14,6 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -43,7 +42,7 @@ public class RecordDao implements Dao<Record, String> {
 
         try {
 
-            CallableStatement prepareCall = getConnection().prepareCall("SELECT camcode, camdate, duration, preview, code FROM record");
+            CallableStatement prepareCall = getConnection().prepareCall("SELECT camcode, camdate, preview, code FROM record");
             ResultSet resultSet = prepareCall.executeQuery();
 
             while (resultSet.next()) {
@@ -89,13 +88,10 @@ public class RecordDao implements Dao<Record, String> {
 
         record.setCamCode(rs.getString("camCode"));
         record.setDate(rs.getTimestamp("camDate"));
-        record.setDuration(rs.getInt("duration"));
         record.setPreview(rs.getBytes("preview"));
         record.setCode(rs.getLong("code"));
-//        record.setVideo(rs.getBytes("video"));
 
         return record;
-
     }
 
     @Override
@@ -104,10 +100,9 @@ public class RecordDao implements Dao<Record, String> {
         try {
 
             int index = 0;
-            PreparedStatement preparedStatement = getConnection().prepareStatement("INSERT INTO record (camcode, camdate, duration, preview, video, code) VALUES (?, ?, ?, ?, ?, ?)");
+            PreparedStatement preparedStatement = getConnection().prepareStatement("INSERT INTO record (camcode, camdate, preview, video, code) VALUES (?, ?, ?, ?, ?, ?)");
             preparedStatement.setString(++index, record.getCamCode());
             preparedStatement.setTimestamp(++index, new Timestamp(record.getDate().getTime()));
-            preparedStatement.setLong(++index, record.getDuration());
             preparedStatement.setBytes(++index, record.getPreview());
             preparedStatement.setBytes(++index, record.getVideo());
             preparedStatement.setLong(++index, record.getCode());
@@ -142,21 +137,6 @@ public class RecordDao implements Dao<Record, String> {
         }
 
         return result != 0;
-    }
-
-    @Override
-    public boolean update(Record objeto) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public Record findById(String id) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public List<Record> findByAttributes(Map<String, String> map) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }

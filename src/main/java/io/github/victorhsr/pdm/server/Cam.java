@@ -29,8 +29,8 @@ public class Cam {
     public String getCamCode() {
         return camCode;
     }
-    
-    public boolean isConnected(){
+
+    public boolean isConnected() {
         return !camSocket.isClosed();
     }
 

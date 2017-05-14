@@ -21,7 +21,7 @@ public class VideoDataStream {
     private final boolean useBuffer;
 
     /**
-     * Create a DataRecorder object
+     * Create a VideoDataStream object
      *
      * @param useBuffer
      * <ul>
@@ -39,7 +39,8 @@ public class VideoDataStream {
      * Processes frames received by an InputStream and store it in a buffer
      *
      * @param in The stream that provides the data
-     * @return The frame processed
+     * @return The processed frame
+     * @throws java.io.IOException
      */
     public byte[] processFrame(InputStream in) throws IOException {
 
@@ -50,7 +51,7 @@ public class VideoDataStream {
         byte[] frame;
 
         frameLength = dis.readInt();
-//        System.out.println("frame = " + frameLength);
+
         frame = new byte[frameLength];
 
         int len = 0;
@@ -78,7 +79,7 @@ public class VideoDataStream {
 
     /**
      *
-     * @return The buffer
+     * @return
      * <ul>
      * <li>Queue<byte[]> - if exists a buffer</li>
      * <li>Null - if doesn't have a buffer</li>

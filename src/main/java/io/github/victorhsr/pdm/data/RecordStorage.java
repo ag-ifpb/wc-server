@@ -25,16 +25,18 @@ import org.jcodec.api.awt.SequenceEncoder;
  */
 public class RecordStorage {
 
-    private RecordDao dao = new RecordDao();
+    private final RecordDao dao = new RecordDao();
 
+    /**
+     * Renders a temporary video file and then, pass it to the DB
+     *
+     * @param frameBuffer The buffer containing the video frames
+     * @param camCode The camCode of the client
+     * @throws IOException
+     */
     public void saveVideo(Queue<byte[]> frameBuffer, String camCode) throws IOException {
 
         String id = String.valueOf(System.currentTimeMillis());
-
-        int durarion = 0;
-        durarion = frameBuffer.size();
-        System.out.println("total de frames = " + durarion);
-        durarion /= 15;
 
         String src = "http://192.168.2.106:8080/webcam-server/show?camCode=" + camCode + id + ".mp4";
         src = src.replace(" ", "%20");
@@ -43,7 +45,6 @@ public class RecordStorage {
         record.setCamCode(camCode);
         record.setDate(new Timestamp(System.currentTimeMillis()));
         record.setUri(URI.create(src));
-        record.setDuration(durarion);
         record.setCode(System.currentTimeMillis());
 
         URL resource = RecordStorage.class.getClassLoader().getResource("");
@@ -56,7 +57,6 @@ public class RecordStorage {
         ByteArrayInputStream byteArrayInputStream;
 
         SequenceEncoder encoder = new SequenceEncoder(file);
-        
 
         int previewPosition = frameBuffer.size() / 2;
         int previewCount = 0;

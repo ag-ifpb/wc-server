@@ -40,12 +40,11 @@ public class Records {
 
         List<Record> records = dao.getAll();
 
-        for (Record record : records) {
+        records.forEach(record -> {
             String src = "http://192.168.2.106:8080/webcam-server/show?camcode=" + record.getCamCode() + "&code=" + record.getCode();
             src = src.replace(" ", "%20");
             record.setUri(URI.create(src));
-            System.out.println(record.getDate());
-        }
+        });
 
         GenericEntity<List<Record>> entityResponse = new GenericEntity<List<Record>>(records) {
         };
@@ -65,7 +64,7 @@ public class Records {
             return Response.ok().build();
         }
 
-        return Response.status(Status.BAD_REQUEST).build();
+        return Response.status(Status.NOT_FOUND).build();
     }
 
 }

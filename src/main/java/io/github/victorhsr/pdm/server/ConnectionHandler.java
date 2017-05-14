@@ -25,7 +25,11 @@ public class ConnectionHandler extends Thread {
     private final OutputStream out;
     private final DataInputStream dis;
     private final DataOutputStream dos;
-    private boolean holdConnection = false;
+
+    public static final int RECORD_CAM_COMMAND = 1;
+    public static final int LIVE_STREAMING_COMMAND = 2;
+    public static final int REQUEST_RECORD_COMMAND = 3;
+    public static final int REQUEST_LIVE_STREAMING_COMMAND = 4;
 
     public ConnectionHandler(Cam camClient) throws IOException {
         super("Thread of " + camClient.getCamCode());
@@ -54,16 +58,16 @@ public class ConnectionHandler extends Thread {
 
                     switch (command) {
 
-                        case 1:
+                        case RECORD_CAM_COMMAND:
                             recordCam();
                             break;
-                        case 2:
+                        case LIVE_STREAMING_COMMAND:
                             liveStreaming();
                             break;
-                        case 4:
+                        case REQUEST_RECORD_COMMAND:
                             requestRecord();
                             break;
-                        case 5:
+                        case REQUEST_LIVE_STREAMING_COMMAND:
                             requestLiveStreaming();
                             break;
                     }
@@ -77,6 +81,12 @@ public class ConnectionHandler extends Thread {
 
     }
 
+    /**
+     * Record the video data sends by the camClient
+     *
+     * @throws IOException
+     * @throws InterruptedException
+     */
     private void recordCam() throws IOException, InterruptedException {
 
         VideoDataStream vds = new VideoDataStream(true);
@@ -86,7 +96,7 @@ public class ConnectionHandler extends Thread {
                 if (dis.available() > 0) {
                     vds.processFrame(dis);
                 } else {
-                    //escrita de bytes apenas para detectar o fechamento do socket
+                    //Writing bytes only to detect the socket closing
                     dos.write(Byte.MIN_VALUE);
                     dos.flush();
                 }
@@ -104,6 +114,12 @@ public class ConnectionHandler extends Thread {
         vds.cleanBuffer();
     }
 
+    /**
+     * Stream video data between two camClients and stores it simultaneously
+     *
+     * @throws IOException
+     * @throws InterruptedException
+     */
     private void liveStreaming() throws IOException, InterruptedException {
 
         CamStreaming camStreaming = new CamStreaming();
@@ -119,10 +135,9 @@ public class ConnectionHandler extends Thread {
                         try {
                             camStreaming.sendData(frame);
                         } catch (IOException ex) {
-                            System.out.println(ex.getMessage());
                         }
                     } else {
-                        //escrita de bytes apenas para detectar o fechamento do socket
+                        //Writing bytes only to detect the socket closing
                         dos.write(Byte.MIN_VALUE);
                         dos.flush();
                     }
@@ -143,26 +158,36 @@ public class ConnectionHandler extends Thread {
 
     }
 
+    /**
+     * Requests video recording to another camClient
+     *
+     * @throws IOException
+     */
     private void requestRecord() throws IOException {
 
         String targetCamCode = dis.readUTF();
-        System.out.println("targetCamCode = " + targetCamCode);
+
         Cam targetCam = CamRegister.findRegisteredCam(targetCamCode);
 
         DataOutputStream dos = new DataOutputStream(targetCam.getCamSocket().getOutputStream());
 
-        dos.writeInt(1);
+        dos.writeInt(REQUEST_RECORD_COMMAND);
     }
 
+    /**
+     * Requests video live streaming to another camClient
+     *
+     * @throws IOException
+     */
     private void requestLiveStreaming() throws IOException {
 
         String targetCamCode = dis.readUTF();
-        System.out.println("targetCamCode = " + targetCamCode);
+
         Cam targetCam = CamRegister.findRegisteredCam(targetCamCode);
 
         DataOutputStream targetDos = new DataOutputStream(targetCam.getCamSocket().getOutputStream());
 
-        targetDos.writeInt(2);
+        targetDos.writeInt(REQUEST_LIVE_STREAMING_COMMAND);
         targetDos.writeUTF(camClient.getCamCode());
     }
 

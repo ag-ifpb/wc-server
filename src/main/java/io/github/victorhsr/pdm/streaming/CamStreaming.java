@@ -19,8 +19,15 @@ import java.io.OutputStream;
  */
 public class CamStreaming {
 
-    private Cam clientTarget;
+    private Cam camTarget;
 
+    /**
+     * Prepares the stream, obtaining data on the transmission target
+     *
+     * @param in The InputStream that contains the target data
+     * @return True if the operation completed successfully, otherwise, returns
+     * False
+     */
     public boolean prepareStream(InputStream in) {
 
         try {
@@ -29,9 +36,9 @@ public class CamStreaming {
 
             String targetCamCode = dis.readUTF();
 
-            clientTarget = CamRegister.findRegisteredCam(targetCamCode);
+            camTarget = CamRegister.findRegisteredCam(targetCamCode);
 
-            if (clientTarget == null) {
+            if (camTarget == null) {
                 return false;
             }
 
@@ -43,11 +50,17 @@ public class CamStreaming {
 
     }
 
+    /**
+     * Send data to the camTarget
+     *
+     * @param data The data to be sent
+     * @throws IOException
+     */
     public void sendData(byte[] data) throws IOException {
 
-        OutputStream out = clientTarget.getCamSocket().getOutputStream();
+        OutputStream out = camTarget.getCamSocket().getOutputStream();
         DataOutputStream dos = new DataOutputStream(out);
-        System.out.println("data leng "+data.length);
+
         dos.writeInt(data.length);
         dos.write(data);
     }

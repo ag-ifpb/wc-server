@@ -21,7 +21,6 @@ public class Record {
 
     private String camCode;
     private Date date;
-    private int duration;
     @XmlJavaTypeAdapter(PreviewAdapter.class)
     private byte[] preview;
     @XmlTransient
@@ -32,10 +31,9 @@ public class Record {
     public Record() {
     }
 
-    public Record(String camCode, Date date, int duration, byte[] preview, byte[] video, URI uri, long code) {
+    public Record(String camCode, Date date, byte[] preview, byte[] video, URI uri, long code) {
         this.camCode = camCode;
         this.date = date;
-        this.duration = duration;
         this.preview = preview;
         this.video = video;
         this.uri = uri;
@@ -66,14 +64,6 @@ public class Record {
         this.date = date;
     }
 
-    public int getDuration() {
-        return duration;
-    }
-
-    public void setDuration(int duration) {
-        this.duration = duration;
-    }
-
     public byte[] getPreview() {
         return preview;
     }
@@ -100,7 +90,7 @@ public class Record {
 
     @Override
     public String toString() {
-        return "Record{" + "camCode=" + camCode + ", date=" + date + ", duration=" + duration + ", uri=" + uri + ", code=" + code + '}';
+        return "Record{" + "camCode=" + camCode + ", date=" + date + ", uri=" + uri + ", code=" + code + '}';
     }
 
 }

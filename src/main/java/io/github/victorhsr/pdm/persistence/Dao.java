@@ -8,7 +8,6 @@ package io.github.victorhsr.pdm.persistence;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Map;
 
 /**
  *
@@ -21,12 +20,6 @@ public interface Dao<T, I> {
     boolean save(T objeto);
 
     boolean delete(T objeto);
-
-    boolean update(T objeto);
-
-    T findById(I id);
-
-    List<T> findByAttributes(Map<String, String> map);
 
     List<T> getAll();
 

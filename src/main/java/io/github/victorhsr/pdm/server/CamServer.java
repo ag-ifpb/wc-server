@@ -8,8 +8,6 @@ package io.github.victorhsr.pdm.server;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -18,25 +16,22 @@ import java.util.logging.Logger;
 public class CamServer implements Runnable {
 
     private ServerSocket serverSocket;
-    private CamRegister camRegister;
-    private int port = 1099;
+    private final int port = 3000;
 
     @Override
     public void run() {
 
         try {
-            camRegister = new CamRegister();
             serverSocket = new ServerSocket(port);
 
             while (!serverSocket.isClosed()) {
 
                 Socket camClient = serverSocket.accept();
-
-                camRegister.addCamClient(camClient);
+                CamRegister.addCamClient(camClient);
             }
 
         } catch (IOException ex) {
-            Logger.getLogger(CamServer.class.getName()).log(Level.SEVERE, null, ex);
+            ex.printStackTrace();
         }
 
     }
