@@ -89,6 +89,8 @@ public class RecordStorage {
 
         dao.save(record);
         file.delete();
+        
+        System.out.println("teoricamente salvou");
     }
 
 }

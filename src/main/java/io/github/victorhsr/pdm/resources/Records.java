@@ -41,7 +41,7 @@ public class Records {
         List<Record> records = dao.getAll();
 
         records.forEach(record -> {
-            String src = "http://192.168.2.106:8080/webcam-server/show?camcode=" + record.getCamCode() + "&code=" + record.getCode();
+            String src = "http://192.168.2.106:8080/show?camcode=" + record.getCamCode() + "&code=" + record.getCode();
             src = src.replace(" ", "%20");
             record.setUri(URI.create(src));
         });

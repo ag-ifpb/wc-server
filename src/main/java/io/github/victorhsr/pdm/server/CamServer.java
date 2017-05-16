@@ -27,6 +27,7 @@ public class CamServer implements Runnable {
             while (!serverSocket.isClosed()) {
 
                 Socket camClient = serverSocket.accept();
+                camClient.setKeepAlive(true);
                 CamRegister.addCamClient(camClient);
             }
 

@@ -7,11 +7,11 @@ package io.github.victorhsr.pdm.streaming;
 
 import io.github.victorhsr.pdm.server.Cam;
 import io.github.victorhsr.pdm.server.CamRegister;
+import io.github.victorhsr.pdm.server.ConnectionHandler;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 
 /**
  *
@@ -20,6 +20,8 @@ import java.io.OutputStream;
 public class CamStreaming {
 
     private Cam camTarget;
+    private DataInputStream dis;
+    private DataOutputStream dos;
 
     /**
      * Prepares the stream, obtaining data on the transmission target
@@ -32,11 +34,13 @@ public class CamStreaming {
 
         try {
 
-            DataInputStream dis = new DataInputStream(in);
-
-            String targetCamCode = dis.readUTF();
-
+            DataInputStream tempDis = new DataInputStream(in);
+            System.out.println("vou pegar o target");
+            String targetCamCode = tempDis.readUTF();
+            System.out.println("targetCamCode = " + targetCamCode);
             camTarget = CamRegister.findRegisteredCam(targetCamCode);
+            dos = new DataOutputStream(camTarget.getCamSocket().getOutputStream());
+            dis = new DataInputStream(camTarget.getCamSocket().getInputStream());
 
             if (camTarget == null) {
                 return false;
@@ -58,11 +62,19 @@ public class CamStreaming {
      */
     public void sendData(byte[] data) throws IOException {
 
-        OutputStream out = camTarget.getCamSocket().getOutputStream();
-        DataOutputStream dos = new DataOutputStream(out);
-
         dos.writeInt(data.length);
         dos.write(data);
+    }
+
+    public boolean isTargetConnected() throws IOException {
+
+        if(dis.available() > 0){
+            int status = dis.readInt();
+
+            return status == ConnectionHandler.CONTINUE_STREAM_CODE;
+        }
+        
+        return true;
     }
 
 }

@@ -30,6 +30,10 @@ public class ConnectionHandler extends Thread {
     public static final int LIVE_STREAMING_COMMAND = 2;
     public static final int REQUEST_RECORD_COMMAND = 3;
     public static final int REQUEST_LIVE_STREAMING_COMMAND = 4;
+    public static final int NOT_FOUND_CODE = 404;
+    public static final int SUCCESS_CODE = 200;
+    public static final int END_OF_STREAM_CODE = 201;
+    public static final int CONTINUE_STREAM_CODE = 206;
 
     public ConnectionHandler(Cam camClient) throws IOException {
         super("Thread of " + camClient.getCamCode());
@@ -55,7 +59,7 @@ public class ConnectionHandler extends Thread {
 
                 if (dis.available() > 0) {
                     command = dis.readInt();
-
+                    System.out.println("command = " + command);
                     switch (command) {
 
                         case RECORD_CAM_COMMAND:
@@ -71,6 +75,7 @@ public class ConnectionHandler extends Thread {
                             requestLiveStreaming();
                             break;
                     }
+                    System.out.println(".-.");
                 }
                 sleep(20);
             }
@@ -128,25 +133,21 @@ public class ConnectionHandler extends Thread {
 
         if (camStreaming.prepareStream(in)) {
 
-            while (true) {
+            while (camStreaming.isTargetConnected()) {
                 try {
+
                     if (dis.available() > 0) {
                         frame = vds.processFrame(dis);
-                        try {
-                            camStreaming.sendData(frame);
-                        } catch (IOException ex) {
-                        }
-                    } else {
-                        //Writing bytes only to detect the socket closing
-                        dos.write(Byte.MIN_VALUE);
-                        dos.flush();
+                        camStreaming.sendData(frame);
                     }
                 } catch (Exception ex) {
-                    CamRegister.removeCamClient(camClient);
+                    ex.printStackTrace();
                     break;
                 }
                 sleep(20);
             }
+            System.out.println("saiu do while...");
+            dos.writeInt(END_OF_STREAM_CODE);
 
             RecordStorage recordStorage = new RecordStorage();
 
@@ -169,9 +170,14 @@ public class ConnectionHandler extends Thread {
 
         Cam targetCam = CamRegister.findRegisteredCam(targetCamCode);
 
-        DataOutputStream dos = new DataOutputStream(targetCam.getCamSocket().getOutputStream());
+        try {
+            DataOutputStream targetDos = new DataOutputStream(targetCam.getCamSocket().getOutputStream());
+            targetDos.writeInt(RECORD_CAM_COMMAND);
 
-        dos.writeInt(REQUEST_RECORD_COMMAND);
+            dos.writeInt(SUCCESS_CODE);
+        } catch (Exception e) {
+            dos.writeInt(NOT_FOUND_CODE);
+        }
     }
 
     /**
@@ -185,10 +191,18 @@ public class ConnectionHandler extends Thread {
 
         Cam targetCam = CamRegister.findRegisteredCam(targetCamCode);
 
-        DataOutputStream targetDos = new DataOutputStream(targetCam.getCamSocket().getOutputStream());
+        try {
+            DataOutputStream targetDos = new DataOutputStream(targetCam.getCamSocket().getOutputStream());
 
-        targetDos.writeInt(REQUEST_LIVE_STREAMING_COMMAND);
-        targetDos.writeUTF(camClient.getCamCode());
+            targetDos.writeInt(LIVE_STREAMING_COMMAND);
+            targetDos.writeUTF(camClient.getCamCode());
+
+            dos.writeInt(SUCCESS_CODE);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            dos.writeInt(NOT_FOUND_CODE);
+        }
     }
 
 }

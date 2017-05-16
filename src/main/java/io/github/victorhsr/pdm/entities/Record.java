@@ -7,6 +7,9 @@ package io.github.victorhsr.pdm.entities;
 
 import io.github.victorhsr.pdm.adapters.PreviewAdapter;
 import java.net.URI;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;

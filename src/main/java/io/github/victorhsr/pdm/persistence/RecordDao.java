@@ -100,7 +100,7 @@ public class RecordDao implements Dao<Record, String> {
         try {
 
             int index = 0;
-            PreparedStatement preparedStatement = getConnection().prepareStatement("INSERT INTO record (camcode, camdate, preview, video, code) VALUES (?, ?, ?, ?, ?, ?)");
+            PreparedStatement preparedStatement = getConnection().prepareStatement("INSERT INTO record (camcode, camdate, preview, video, code) VALUES (?, ?, ?, ?, ?)");
             preparedStatement.setString(++index, record.getCamCode());
             preparedStatement.setTimestamp(++index, new Timestamp(record.getDate().getTime()));
             preparedStatement.setBytes(++index, record.getPreview());
