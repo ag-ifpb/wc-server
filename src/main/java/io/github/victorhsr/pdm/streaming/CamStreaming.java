@@ -35,9 +35,9 @@ public class CamStreaming {
         try {
 
             DataInputStream tempDis = new DataInputStream(in);
-            System.out.println("vou pegar o target");
+
             String targetCamCode = tempDis.readUTF();
-            System.out.println("targetCamCode = " + targetCamCode);
+
             camTarget = CamRegister.findRegisteredCam(targetCamCode);
             dos = new DataOutputStream(camTarget.getCamSocket().getOutputStream());
             dis = new DataInputStream(camTarget.getCamSocket().getInputStream());
@@ -64,16 +64,17 @@ public class CamStreaming {
 
         dos.writeInt(data.length);
         dos.write(data);
+        dos.flush();
     }
 
     public boolean isTargetConnected() throws IOException {
 
-        if(dis.available() > 0){
+        if (dis.available() > 0) {
             int status = dis.readInt();
 
             return status == ConnectionHandler.CONTINUE_STREAM_CODE;
         }
-        
+
         return true;
     }
 
